@@ -9,6 +9,7 @@ using namespace gb;
 // CONSTANTS
 static constexpr unsigned int DISPLAY_WIDTH = 160;
 static constexpr unsigned int DISPLAY_HEIGHT = 144;
+static constexpr int SCANLINES_PER_FRAME = 144;
 
 // PROTOTYPES
 static void gpu_callback(const GPU::Scanline& scanline, int line);
@@ -16,6 +17,8 @@ static uint8_t convert_rgb24_to_rgb15(uint8_t c);
 
 // VARIABLES
 static GameboyCore core;
+static int steps = 1024;
+static int scanline_counter = 0;
 
 static retro_environment_t environment_cb;
 static retro_video_refresh_t video_cb;
@@ -53,71 +56,6 @@ void retro_deinit()
 
 }
 
-void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb)
-{
-}
-
-void retro_set_video_refresh(retro_video_refresh_t cb) 
-{ 
-	video_cb = cb;
-}
-
-void retro_set_audio_sample(retro_audio_sample_t cb) 
-{ 
-	audio_cb = cb;
-}
-
-void retro_set_input_poll(retro_input_poll_t cb) 
-{ 
-	input_poll_cb = cb;
-}
-
-void retro_set_input_state(retro_input_state_t cb)
-{ 
-	input_state_cb = cb;
-}
-
-void retro_set_controller_port_device(unsigned port, unsigned device)
-{
-}
-
-size_t retro_serialize_size(void)
-{ 
-	return 0;
-}
-
-bool retro_serialize(void *data, size_t size) 
-{ 
-	return false;
-}
-
-bool retro_unserialize(const void *data, size_t size) 
-{ 
-	return false;
-}
-
-void retro_cheat_reset(void) 
-{
-}
-
-void retro_cheat_set(unsigned index, bool enabled, const char *code)
-{
-}
-
-void *retro_get_memory_data(unsigned id) 
-{ 
-	return NULL;
-}
-
-size_t retro_get_memory_size(unsigned id) 
-{ 
-	return 0;
-}
-
-unsigned retro_get_region(void) 
-{ 
-	return RETRO_REGION_PAL;
-}
 
 /**
 	Tell libretro information about the core
@@ -149,8 +87,6 @@ void retro_get_system_av_info(retro_system_av_info* info)
 void retro_set_environment(retro_environment_t cb)
 {
 	// configure run with no loaded rom
-
-	
 	environment_cb = cb;
 	bool no_rom = true;
 	cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_rom);
@@ -195,8 +131,16 @@ void retro_reset(void)
 */
 void retro_run(void)
 {
-	core.update(1024);
 
+	// update the core
+	core.update(steps);
+
+	// perform a simple error calculation to adjust the number of cpu steps required to compute 144 scanlines every frame
+	auto scanline_error = SCANLINES_PER_FRAME - scanline_counter;
+	steps += scanline_error;
+	scanline_counter = 0;
+
+	// send the current frame buffer to frontend
 	video_cb(framebuffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_WIDTH * sizeof(short));
 }
 
@@ -208,6 +152,8 @@ void gpu_callback(const GPU::Scanline& scanline, int line)
 {
 	const auto offset = DISPLAY_WIDTH * line;
 	const auto size = scanline.size();
+
+	scanline_counter++;
 
 	for (auto i = 0u; i < size; ++i)
 	{
@@ -232,5 +178,72 @@ uint8_t convert_rgb24_to_rgb15(uint8_t c)
 	float current_ratio = (float)c / 255.0f;
 
 	return (uint8_t)((float)MAX_15 * current_ratio);
+}
+
+
+void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb)
+{
+}
+
+void retro_set_video_refresh(retro_video_refresh_t cb)
+{
+	video_cb = cb;
+}
+
+void retro_set_audio_sample(retro_audio_sample_t cb)
+{
+	audio_cb = cb;
+}
+
+void retro_set_input_poll(retro_input_poll_t cb)
+{
+	input_poll_cb = cb;
+}
+
+void retro_set_input_state(retro_input_state_t cb)
+{
+	input_state_cb = cb;
+}
+
+void retro_set_controller_port_device(unsigned port, unsigned device)
+{
+}
+
+size_t retro_serialize_size(void)
+{
+	return 0;
+}
+
+bool retro_serialize(void *data, size_t size)
+{
+	return false;
+}
+
+bool retro_unserialize(const void *data, size_t size)
+{
+	return false;
+}
+
+void retro_cheat_reset(void)
+{
+}
+
+void retro_cheat_set(unsigned index, bool enabled, const char *code)
+{
+}
+
+void *retro_get_memory_data(unsigned id)
+{
+	return NULL;
+}
+
+size_t retro_get_memory_size(unsigned id)
+{
+	return 0;
+}
+
+unsigned retro_get_region(void)
+{
+	return RETRO_REGION_PAL;
 }
 
