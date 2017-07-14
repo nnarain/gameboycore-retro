@@ -22,7 +22,7 @@ install:
   - git clone --depth=1 https://github.com/libretro/libretro-common.git c:\libs\libretro-common
 
 before_build:
-  - cd c:\projects\gameboycore-retro
+  - cd c:\projects\gameboycore-retro 
   - mkdir build && cd build
   - cmake .. -DLIBRETRO_COMMON_INCLUDE_DIR=%LIBRETRO_COMMON_INCLUDE_DIR%
 
