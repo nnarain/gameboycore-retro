@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(gameboycore_retro)
+project(gameboycore_libretro)
 
 include(TestBigEndian)
 test_big_endian(IS_BIG_ENDIAN)
