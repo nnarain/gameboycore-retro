@@ -31,7 +31,7 @@ build:
   verbosity: minimal
 
 after_build:
-  - msbuild C:\projects\gameboycore_libretro\build\PACKAGE.vcxproj /verbosity:quiet
+  - msbuild C:\projects\gameboycore-retro\build\PACKAGE.vcxproj /verbosity:quiet
 
 artifacts:
 - path: .\build\gameboycore_libretro-*-win32.zip
