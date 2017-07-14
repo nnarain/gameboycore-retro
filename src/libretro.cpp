@@ -2,7 +2,7 @@
 #include <libretro.h>
 #include <gameboycore/gameboycore.h>
 
-#include <iostream>
+#include <array>
 
 using namespace gb;
 
@@ -11,15 +11,39 @@ static constexpr unsigned int DISPLAY_WIDTH = 160;
 static constexpr unsigned int DISPLAY_HEIGHT = 144;
 static constexpr int SCANLINES_PER_FRAME = 144;
 
+
+//! Map retropad to gb keys
+struct KeyMap
+{
+	unsigned int retro_key;
+	Joy::Key gb_key;
+};
+
 // PROTOTYPES
 static void gpu_callback(const GPU::Scanline& scanline, int line);
 static uint8_t convert_rgb24_to_rgb15(uint8_t c);
+static void process_input(Joy::Ptr&);
 
 // VARIABLES
 static GameboyCore core;
 static int steps = 1024;
 static int scanline_counter = 0;
 
+static std::array<KeyMap, 8> key_map = 
+{
+	{
+		{ RETRO_DEVICE_ID_JOYPAD_UP,     Joy::Key::UP },
+		{ RETRO_DEVICE_ID_JOYPAD_DOWN,   Joy::Key::DOWN },
+		{ RETRO_DEVICE_ID_JOYPAD_LEFT,   Joy::Key::LEFT },
+		{ RETRO_DEVICE_ID_JOYPAD_RIGHT,   Joy::Key::RIGHT },
+		{ RETRO_DEVICE_ID_JOYPAD_A,      Joy::Key::A },
+		{ RETRO_DEVICE_ID_JOYPAD_B,      Joy::Key::B },
+		{ RETRO_DEVICE_ID_JOYPAD_START,  Joy::Key::START },
+		{ RETRO_DEVICE_ID_JOYPAD_SELECT, Joy::Key::SELECT }
+	}
+};
+
+// Frontend callbacks
 static retro_environment_t environment_cb;
 static retro_video_refresh_t video_cb;
 static retro_audio_sample_t audio_cb;
@@ -140,10 +164,36 @@ void retro_run(void)
 	steps += scanline_error;
 	scanline_counter = 0;
 
+	process_input(core.getJoypad());
+
+	// get input
+	auto value = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
+
 	// send the current frame buffer to frontend
 	video_cb(framebuffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_WIDTH * sizeof(short));
 }
 
+
+void process_input(Joy::Ptr& joypad)
+{
+	// poll input
+	input_poll_cb();
+
+	// poll retro pad inputs
+	for (const auto& pair : key_map)
+	{
+		auto value = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, pair.retro_key);
+
+		if (value != 0)
+		{
+			joypad->press(pair.gb_key);
+		}
+		else
+		{
+			joypad->release(pair.gb_key);
+		}
+	}
+}
 
 /**
 	GPU Callback
