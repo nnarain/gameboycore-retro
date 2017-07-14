@@ -43,3 +43,27 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_link_libraries(${PROJECT_NAME}
 	${GAMEBOYCORE_STATIC_LIB}
 )
+
+# installation
+include(get-version-config)
+get_version()
+
+install(
+	TARGET ${PROJECT_NAME}
+	ARCHIVE DESTINATION lib
+	LIBRARY DESTINATION lib
+	RUNTIME DESTINATION bin
+)
+
+set(CPACK_GENERATOR "ZIP")
+
+set(CPACK_PACKAGE_NAME "gameboycore_libretro")
+set(CPACK_PACKAGE_VENDOR "nnarain")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GameboyCore libretro core")
+set(CPACK_PACKAGE_VERSION "${VERSION}")
+set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "gameboycore_libretro")
+
+include(CPack)

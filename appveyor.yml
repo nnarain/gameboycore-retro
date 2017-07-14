@@ -1,0 +1,52 @@
+#
+# Appveyor build
+#
+# @author Natesh Narain <nnaraindev@gmail.com>
+
+os: Visual Studio 2015
+
+clone_folder: c:\projects\gameboycore-retro
+
+environment:
+  GAMEBOYCORE_ROOT: c:\libs\gameboycore
+  LIBRETRO_COMMON_INCLUDE_DIR: c:\libs\libretro-common\include
+
+install:
+  - git clone --depth=1 --branch=0.17.0 https://github.com/nnarain/gameboycore.git c:\tmp\gameboycore
+  - cd c:\tmp\gameboycore
+  - mkdir build && cd build
+  - cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS="OFF" -DBUILD_EXAMPLE="OFF" -DCMAKE_INSTALL_PREFIX=c:\libs\gameboycore
+  - nmake
+  - nmake install
+  - set PATH=%PATH%;c:\libs\gameboycore
+  -
+  - git clone --depth=1 https://github.com/libretro/libretro-common.git c:\libs\libretro-common
+
+before_build:
+  - cd c:\projects\gameboycore-retro
+  - mkdir build && cd build
+  - cmake .. -DLIBRETRO_COMMON_INCLUDE_DIR=%LIBRETRO_COMMON_INCLUDE_DIR%
+
+build:
+  project: c:\projects\gameboycore-retro\build\gameboycore_libretro.sln
+  verbosity: minimal
+
+after_build:
+  - msbuild C:\projects\gameboycore\build\PACKAGE.vcxproj /verbosity:quiet
+
+artifacts:
+- path: .\build\gameboycore_libretro-*-win32.zip
+  name: zip-file
+
+deploy:
+  provider: GitHub
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  description: 'v$(APPVEYOR_REPO_TAG_NAME)'
+  auth_token:
+    secure: +F7/lKFe9fc9q4w0lCpc9tR1H4JucHiE7WuevfJCaWOeU/5ul8QojqNACB6ODFgT
+  artifact: zip-file
+  draft: false
+  prerelease: false
+  on:
+    appveyor_repo_tag: true
+  force_update: true
