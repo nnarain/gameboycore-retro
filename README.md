@@ -1,5 +1,7 @@
 # GameboyCore Retro
 
+[![Build status](https://ci.appveyor.com/api/projects/status/mmovpvpvfs04tqv3?svg=true)](https://ci.appveyor.com/project/nnarain/gameboycore-retro)
+
 [RetroArch](http://www.retroarch.com/) is a frontend for emulators and game engines. It allows anyone to develop a `core` which can be loaded by the frontend and use to emulate a particular platform.
 
 [GameboyCore](https://github.com/nnarain/gameboycore) is a Gameboy emulator library that I have been working on. Its self-contained designed made it very easy to deploy as a `libretro` core.
