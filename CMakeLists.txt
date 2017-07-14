@@ -49,7 +49,7 @@ include(get-version-config)
 get_version()
 
 install(
-	TARGET ${PROJECT_NAME}
+	TARGETS ${PROJECT_NAME}
 	ARCHIVE DESTINATION lib
 	LIBRARY DESTINATION lib
 	RUNTIME DESTINATION bin
