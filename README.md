@@ -14,7 +14,7 @@ set GAMEBOYCORE_ROOT=/path/to/gameboycore/root
 
 cd /path/to/repo
 mkdir build && cd build
-cmake .. -DLIBRETRO_COMMON_INCLUDE_DIR
+cmake .. -DLIBRETRO_COMMON_INCLUDE_DIR=/path/to/libretro-common/include
 ```
 
 Usage

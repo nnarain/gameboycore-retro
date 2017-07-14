@@ -166,9 +166,6 @@ void retro_run(void)
 
 	process_input(core.getJoypad());
 
-	// get input
-	auto value = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
-
 	// send the current frame buffer to frontend
 	video_cb(framebuffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_WIDTH * sizeof(short));
 }

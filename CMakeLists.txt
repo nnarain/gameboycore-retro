@@ -1,15 +1,6 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 
 project(gameboycore_libretro)
-
-include(TestBigEndian)
-test_big_endian(IS_BIG_ENDIAN)
-
-if(IS_BIG_ENDIAN)
-	set(ENDIAN "__BIGENDIAN__")
-else(IS_BIG_ENDIAN)
-	set(ENDIAN "__LITTLEENDIAN__")
-endif(IS_BIG_ENDIAN)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
