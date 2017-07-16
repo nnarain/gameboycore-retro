@@ -35,7 +35,7 @@ static std::array<KeyMap, 8> key_map =
 		{ RETRO_DEVICE_ID_JOYPAD_UP,     Joy::Key::UP },
 		{ RETRO_DEVICE_ID_JOYPAD_DOWN,   Joy::Key::DOWN },
 		{ RETRO_DEVICE_ID_JOYPAD_LEFT,   Joy::Key::LEFT },
-		{ RETRO_DEVICE_ID_JOYPAD_RIGHT,   Joy::Key::RIGHT },
+		{ RETRO_DEVICE_ID_JOYPAD_RIGHT,  Joy::Key::RIGHT },
 		{ RETRO_DEVICE_ID_JOYPAD_A,      Joy::Key::A },
 		{ RETRO_DEVICE_ID_JOYPAD_B,      Joy::Key::B },
 		{ RETRO_DEVICE_ID_JOYPAD_START,  Joy::Key::START },
@@ -90,7 +90,7 @@ void retro_get_system_info(retro_system_info* info)
 	info->library_name = "GameboyCore";
 	info->library_version = "0.17.0"; // TODO: generate version header from git
 	info->need_fullpath = false;
-	info->valid_extensions = "bin|gb|gbc";
+	info->valid_extensions = "gb|gbc";
 }
 
 /**
@@ -110,11 +110,7 @@ void retro_get_system_av_info(retro_system_av_info* info)
 
 void retro_set_environment(retro_environment_t cb)
 {
-	// configure run with no loaded rom
 	environment_cb = cb;
-	bool no_rom = true;
-	cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_rom);
-	
 }
 
 /**
@@ -126,10 +122,10 @@ bool retro_load_game(const retro_game_info* info)
 	if (info && info->data)
 	{
 		core.loadROM((uint8_t*)info->data, info->size);
+		
+		// set core callbacks
+		core.getGPU()->setRenderCallback(std::bind(gpu_callback, std::placeholders::_1, std::placeholders::_2));
 	}
-
-	// set core callbacks
-	core.getGPU()->setRenderCallback(std::bind(gpu_callback, std::placeholders::_1, std::placeholders::_2));
 
 	return true;
 }
@@ -155,7 +151,6 @@ void retro_reset(void)
 */
 void retro_run(void)
 {
-
 	// update the core
 	core.update(steps);
 
