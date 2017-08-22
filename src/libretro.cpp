@@ -3,6 +3,7 @@
 #include <gameboycore/gameboycore.h>
 
 #include <array>
+#include <vector>
 
 using namespace gb;
 
@@ -22,12 +23,14 @@ struct KeyMap
 // PROTOTYPES
 static void gpu_callback(const GPU::Scanline& scanline, int line);
 static uint8_t convert_rgb24_to_rgb15(uint8_t c);
+static void apu_callback(int16_t left, int16_t right);
 static void process_input(Joy::Ptr&);
 
 // VARIABLES
 static GameboyCore core;
 static int steps = 1024;
 static int scanline_counter = 0;
+static std::vector<int16_t> audio_buffer;
 
 static std::array<KeyMap, 8> key_map = 
 {
@@ -46,7 +49,7 @@ static std::array<KeyMap, 8> key_map =
 // Frontend callbacks
 static retro_environment_t environment_cb;
 static retro_video_refresh_t video_cb;
-static retro_audio_sample_t audio_cb;
+static retro_audio_sample_batch_t audio_batch_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_log_printf_t log_cb;
@@ -88,7 +91,7 @@ void retro_get_system_info(retro_system_info* info)
 {
 	memset(info, 0, sizeof(retro_system_info));
 	info->library_name = "GameboyCore";
-	info->library_version = "0.17.0"; // TODO: generate version header from git
+	info->library_version = "0.19.0"; // TODO: generate version header from git
 	info->need_fullpath = false;
 	info->valid_extensions = "gb|gbc";
 }
@@ -125,6 +128,7 @@ bool retro_load_game(const retro_game_info* info)
 		
 		// set core callbacks
 		core.getGPU()->setRenderCallback(std::bind(gpu_callback, std::placeholders::_1, std::placeholders::_2));
+		core.getAPU()->setAudioSampleCallback(std::bind(apu_callback, std::placeholders::_1, std::placeholders::_2));
 	}
 
 	return true;
@@ -163,6 +167,13 @@ void retro_run(void)
 
 	// send the current frame buffer to frontend
 	video_cb(framebuffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_WIDTH * sizeof(short));
+
+	// send batched audio
+	if (audio_buffer.size() > 2)
+	{
+		audio_batch_cb(&audio_buffer[0], audio_buffer.size() / 2);
+		audio_buffer.clear();
+	}
 }
 
 
@@ -210,6 +221,12 @@ void gpu_callback(const GPU::Scanline& scanline, int line)
 	}
 }
 
+static void apu_callback(int16_t left, int16_t right)
+{
+	audio_buffer.push_back(left);
+	audio_buffer.push_back(right);
+}
+
 /**
 	Convert
 */
@@ -225,6 +242,7 @@ uint8_t convert_rgb24_to_rgb15(uint8_t c)
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb)
 {
+	audio_batch_cb = cb;
 }
 
 void retro_set_video_refresh(retro_video_refresh_t cb)
@@ -234,7 +252,6 @@ void retro_set_video_refresh(retro_video_refresh_t cb)
 
 void retro_set_audio_sample(retro_audio_sample_t cb)
 {
-	audio_cb = cb;
 }
 
 void retro_set_input_poll(retro_input_poll_t cb)
