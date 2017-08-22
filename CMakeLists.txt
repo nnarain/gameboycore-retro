@@ -43,10 +43,13 @@ install(
 	TARGETS ${PROJECT_NAME}
 	ARCHIVE DESTINATION lib
 	LIBRARY DESTINATION lib
-	RUNTIME DESTINATION bin
+	RUNTIME DESTINATION cores
 )
 
-set(CPACK_GENERATOR "ZIP")
+install(
+	FILES config/gameboycore_libretro.info
+	DESTINATION info
+)
 
 set(CPACK_PACKAGE_NAME "gameboycore_libretro")
 set(CPACK_PACKAGE_VENDOR "nnarain")
