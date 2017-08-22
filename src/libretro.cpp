@@ -29,7 +29,7 @@ static void process_input(Joy::Ptr&);
 // VARIABLES
 static GameboyCore core;
 static int steps = 1024;
-static int scanline_counter = 0;
+static volatile unsigned int scanline_counter = 0;
 static std::vector<int16_t> audio_buffer;
 
 static std::array<KeyMap, 8> key_map = 
@@ -155,12 +155,13 @@ void retro_reset(void)
 */
 void retro_run(void)
 {
-	// update the core
-	core.update(steps);
+	// run the core until it produces 144 scanlines which is the content of one frame
+	while (scanline_counter < SCANLINES_PER_FRAME)
+	{
+		// update the core
+		core.update(steps);
+	}
 
-	// perform a simple error calculation to adjust the number of cpu steps required to compute 144 scanlines every frame
-	auto scanline_error = SCANLINES_PER_FRAME - scanline_counter;
-	steps += scanline_error;
 	scanline_counter = 0;
 
 	process_input(core.getJoypad());
