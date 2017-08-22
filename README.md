@@ -1,6 +1,7 @@
 # GameboyCore Retro
 
 [![Build status](https://ci.appveyor.com/api/projects/status/mmovpvpvfs04tqv3?svg=true)](https://ci.appveyor.com/project/nnarain/gameboycore-retro)
+[![GitHub release](https://img.shields.io/github/release/nnarain/gameboycore-retro.svg)](https://github.com/nnarain/gameboycore-retro/releases)
 
 [RetroArch](http://www.retroarch.com/) is a frontend for emulators and game engines. It allows anyone to develop a `core` which can be loaded by the frontend and use to emulate a particular platform.
 
@@ -16,6 +17,10 @@ cd /path/to/repo
 mkdir build && cd build
 cmake .. -DLIBRETRO_COMMON_INCLUDE_DIR=/path/to/libretro-common/include
 ```
+
+Installation
+------------
+Download the latest [release](https://github.com/nnarain/gameboycore-retro/releases) installer. Run the installer an point the install directory to your RetroArch installation.
 
 Usage
 -----
