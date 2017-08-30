@@ -12,7 +12,7 @@ environment:
   LIBRETRO_COMMON_INCLUDE_DIR: c:\libs\libretro-common\include
 
 install:
-  - git clone --depth=1 --branch=0.19.0 https://github.com/nnarain/gameboycore.git c:\tmp\gameboycore
+  - git clone --depth=1 --branch=0.20.0 https://github.com/nnarain/gameboycore.git c:\tmp\gameboycore
   - cd c:\tmp\gameboycore
   - mkdir build && cd build
   - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS="OFF" -DBUILD_EXAMPLE="OFF" -DCMAKE_INSTALL_PREFIX=c:\libs\gameboycore
