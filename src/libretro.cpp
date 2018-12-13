@@ -10,15 +10,7 @@ using namespace gb;
 // CONSTANTS
 static constexpr unsigned int DISPLAY_WIDTH = 160;
 static constexpr unsigned int DISPLAY_HEIGHT = 144;
-static constexpr int SCANLINES_PER_FRAME = 144;
 
-
-//! Map retropad to gb keys
-struct KeyMap
-{
-    unsigned int retro_key;
-    Joy::Key gb_key;
-};
 
 // PROTOTYPES
 static void gpu_callback(const GPU::Scanline& scanline, int line);
@@ -28,11 +20,10 @@ static void process_input();
 
 // VARIABLES
 static GameboyCore core;
-static int steps = 1024;
-static volatile unsigned int scanline_counter = 0;
+static short framebuffer[DISPLAY_WIDTH * DISPLAY_HEIGHT];
 static std::vector<int16_t> audio_buffer;
 
-static std::array<KeyMap, 8> key_map = 
+static std::array<std::pair<std::size_t, Joy::Key>, 8> key_map = 
 {
     {
         { RETRO_DEVICE_ID_JOYPAD_UP,     Joy::Key::UP },
@@ -54,7 +45,6 @@ static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_log_printf_t log_cb;
 
-static short framebuffer[DISPLAY_WIDTH * DISPLAY_HEIGHT];
 
 unsigned retro_api_version(void)
 {
@@ -179,8 +169,8 @@ void process_input()
     // poll retro pad inputs
     for (const auto& pair : key_map)
     {
-        auto value = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, pair.retro_key);
-        core.input(pair.gb_key, value != 0);
+        auto value = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, pair.first);
+        core.input(pair.second, value != 0);
     }
 }
 
@@ -191,8 +181,6 @@ void gpu_callback(const GPU::Scanline& scanline, int line)
 {
     const auto offset = DISPLAY_WIDTH * line;
     const auto size = scanline.size();
-
-    scanline_counter++;
 
     for (auto i = 0u; i < size; ++i)
     {
