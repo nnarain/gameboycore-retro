@@ -91,7 +91,7 @@ void retro_get_system_info(retro_system_info* info)
 {
 	memset(info, 0, sizeof(retro_system_info));
 	info->library_name = "GameboyCore";
-	info->library_version = "0.19.0"; // TODO: generate version header from git
+	info->library_version = "0.22.0"; // TODO: generate version header from git
 	info->need_fullpath = false;
 	info->valid_extensions = "gb|gbc";
 }
