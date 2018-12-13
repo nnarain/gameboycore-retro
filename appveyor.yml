@@ -7,24 +7,13 @@ os: Visual Studio 2015
 
 clone_folder: c:\projects\gameboycore-retro
 
-environment:
-  GAMEBOYCORE_ROOT: c:\libs\gameboycore
-  LIBRETRO_COMMON_INCLUDE_DIR: c:\libs\libretro-common\include
-
-install:
-  - git clone --depth=1 --branch=0.19.0 https://github.com/nnarain/gameboycore.git c:\tmp\gameboycore
-  - cd c:\tmp\gameboycore
-  - mkdir build && cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS="OFF" -DBUILD_EXAMPLE="OFF" -DCMAKE_INSTALL_PREFIX=c:\libs\gameboycore
-  - msbuild gameboycore.sln /verbosity:quiet
-  - msbuild INSTALL.vcxproj /verbosity:quiet
-  -
-  - git clone --depth=1 https://github.com/libretro/libretro-common.git c:\libs\libretro-common
+configuration: Release
 
 before_build:
   - cd c:\projects\gameboycore-retro
+  - git submodule update --init --recursive
   - mkdir build && cd build
-  - cmake .. -DLIBRETRO_COMMON_INCLUDE_DIR=%LIBRETRO_COMMON_INCLUDE_DIR%
+  - cmake .. -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF
 
 build:
   project: c:\projects\gameboycore-retro\build\gameboycore_libretro.sln
