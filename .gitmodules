@@ -1,0 +1,6 @@
+[submodule "src/external/gameboycore"]
+	path = src/external/gameboycore
+	url = https://github.com/nnarain/gameboycore.git
+[submodule "src/external/libretro-common"]
+	path = src/external/libretro-common
+	url = https://github.com/libretro/libretro-common.git
