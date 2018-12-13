@@ -1,38 +1,30 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0.0)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
 
 project(gameboycore_libretro)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+# External dependencies
+add_subdirectory(src/external)
 
-# gameboycore
-find_package(GameboyCore)
 
-message("${GAMEBOYCORE_STATIC_LIB}")
-
-SET(GAMEBOYCORE_RETRO_HEADERS
-
-)
-
-SET(GAMEBOYCORE_RETRO_SOURCES
+set(GAMEBOYCORE_RETRO_SOURCES
     src/libretro.cpp
 )
 
-include_directories(
-    ${GAMEBOYCORE_INCLUDE_DIR}
-    ${LIBRETRO_COMMON_INCLUDE_DIR}
-)
-
 add_library(${PROJECT_NAME} SHARED
-    ${GAMEBOYCORE_RETRO_HEADERS}
     ${GAMEBOYCORE_RETRO_SOURCES}
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-	COMPILE_FLAGS "-DGAMEBOYCORE_STATIC"
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${LIBRETRO_INCLUDE_DIR}
 )
 
+target_compile_options(${PROJECT_NAME} PRIVATE -DGAMEBOYCORE_STATIC=1)
+
 target_link_libraries(${PROJECT_NAME}
-	${GAMEBOYCORE_STATIC_LIB}
+    gameboycore::gameboycore
 )
 
 # installation
@@ -40,15 +32,15 @@ include(get-version-config)
 get_version()
 
 install(
-	TARGETS ${PROJECT_NAME}
-	ARCHIVE DESTINATION lib
-	LIBRARY DESTINATION lib
-	RUNTIME DESTINATION cores
+    TARGETS ${PROJECT_NAME}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION cores
 )
 
 install(
-	FILES config/gameboycore_libretro.info
-	DESTINATION info
+    FILES config/gameboycore_libretro.info
+    DESTINATION info
 )
 
 set(CPACK_PACKAGE_NAME "gameboycore_libretro")
