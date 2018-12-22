@@ -30,7 +30,12 @@ target_link_libraries(${PROJECT_NAME}
     gameboycore::gameboycore
 )
 
-# installation
+########################################################################################################################
+### Installation                                                                                                     ###
+########################################################################################################################
+
+# Configure the .info file
+configure_file(config/gameboycore_libretro.info.in ${CMAKE_BINARY_DIR}/gameboycore_libretro.info @ONLY)
 
 install(
     TARGETS ${PROJECT_NAME}
@@ -40,7 +45,7 @@ install(
 )
 
 install(
-    FILES config/gameboycore_libretro.info
+    FILES ${CMAKE_BINARY_DIR}/gameboycore_libretro.info
     DESTINATION info
 )
 
