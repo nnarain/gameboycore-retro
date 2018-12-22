@@ -5,9 +5,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 project(gameboycore_libretro)
 
+# Get project version from git tag
+include(get-version-config)
+get_version()
+
 # External dependencies
 add_subdirectory(src/external)
-
 
 set(GAMEBOYCORE_RETRO_SOURCES
     src/libretro.cpp
@@ -21,15 +24,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${LIBRETRO_INCLUDE_DIR}
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -DGAMEBOYCORE_STATIC=1)
+target_compile_options(${PROJECT_NAME} PRIVATE -DGAMEBOYCORE_STATIC=1 -DGAMEBOYCORE_RETRO_VERSION="${VERSION}")
 
 target_link_libraries(${PROJECT_NAME}
     gameboycore::gameboycore
 )
 
 # installation
-include(get-version-config)
-get_version()
 
 install(
     TARGETS ${PROJECT_NAME}
