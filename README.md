@@ -11,19 +11,30 @@ Build
 -----
 
 ```bash
-set GAMEBOYCORE_ROOT=/path/to/gameboycore/root
+git clone https://github.com/nnarain/gameboycore-retro
+git submodule update --init --recursive
 
-cd /path/to/repo
 mkdir build && cd build
-cmake .. -DLIBRETRO_COMMON_INCLUDE_DIR=/path/to/libretro-common/include
+cmake ..
+cmake --build . --config Release
 ```
 
 Installation
 ------------
-Download the latest [release](https://github.com/nnarain/gameboycore-retro/releases) installer. Run the installer an point the install directory to your RetroArch installation.
 
-Usage
------
+**Installer (Windows)**
+
+Download the latest [release](https://github.com/nnarain/gameboycore-retro/releases) installer. Run the installer and point the install directory to your RetroArch installation.
+
+**Manual (RetroArch)**
+
+* Build the libretro core by following the above instructions
+* Copy gameboycore_libretro shared library (`.dll` for Windows, `.so` for Linux) to the `<retroarch root>/cores`
+* Copy `gameboycore-retro/config/gameboycore_libretro.info` to `<retroarch root>/info`
+
+
+Commandline Usage
+-----------------
 
 Windows:
 
